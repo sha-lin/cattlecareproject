@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health Records</title>
+</head>
+<body>
+    <h1>Health Records for {{ cattle.tagno }}</h1>
+    <ul>
+        {% for record in health_records %}
+            <li>
+                {{ record.date }}: {{ record.description }}
+                (<a href="{% url 'health_record_edit' record.pk %}">Edit</a>)
+                (<a href="{% url 'health_record_delete' record.pk %}">Delete</a>)
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'health_record_create' cattle.id %}">Add New Health Record</a>
+</body>
+</html>

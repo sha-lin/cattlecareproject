@@ -1,0 +1,975 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>CattleCare - Vaccination Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <style>
+        .dashboard-container {
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+
+        .dashboard-title {
+            color: #5b8c51;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #5b8c51;
+            margin: 15px 0;
+        }
+
+        .stat-title {
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        .chart-container {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        .filter-container select {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .filter-container button {
+            background-color: #5b8c51;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-container button:hover {
+            background-color: #4e7f47;
+        }
+
+        .export-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .export-buttons button {
+            background-color: #5b8c51;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .export-buttons button:hover {
+            background-color: #4e7f47;
+        }
+
+        .vaccine-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .vaccine-table th, .vaccine-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .vaccine-table thead {
+            background-color: #5b8c51;
+            color: white;
+        }
+
+        .vaccine-table tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .vaccine-table tbody tr:hover {
+            background-color: #eaf7e6;
+        }
+
+        .tag-due {
+            background-color: #ffcccb;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        /* Styles for detailed report view */
+.report-toggle-container {
+    margin-bottom: 20px;
+}
+
+.report-toggle-container .btn-group {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.vaccine-type-section {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.vaccine-type-header {
+    background-color: #5b8c51;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vaccine-type-title {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.vaccine-count-badge {
+    background-color: white;
+    color: #5b8c51;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    color: #4e7f47;
+    text-decoration: underline;
+}
+
+/* Animation for view transitions */
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.stat-card.clickable {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card.clickable:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.stat-card.clickable::after {
+    content: '👆 Click for details';
+    display: block;
+    font-size: 0.8rem;
+    color: #5b8c51;
+    margin-top: 10px;
+}
+
+    </style>
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-4 px-lg-5">
+        <a href="{% url 'index' %}" class="navbar-brand d-flex align-items-center">
+            <h1 class="m-0">CattleCare</h1>
+        </a>
+        <button type="button" class="navbar-toggler me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
+                <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
+                <a href="/ab/" class="nav-item nav-link">About</a>
+                <a href="/service/" class="nav-item nav-link">Services</a>
+                <a href="{% url 'manage' %}" class="nav-item nav-link">Appointment</a>
+                <a href="{% url 'register' %}" class="nav-item nav-link">Registration</a>
+            </div>
+            {% if request.session.id %}
+            <div class="navbar-nav">
+                 <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Welcome, {{ request.session.firstname }}</a>
+                    <div class="dropdown-menu bg-light m-0">
+                        <a href=/profile/ class="dropdown-item">Profile</a>
+                        <a href="{% url 'vaccination_history' %}" class="dropdown-item">History</a>
+                        <a href="{% url 'logout' %}" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-4 animated slideInDown">Vaccination Dashboard</h1>
+            <nav aria-label="breadcrumb animated slideInDown">
+                <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Vaccination Dashboard</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Dashboard Content -->
+    <div class="container dashboard-container">
+        <h2 class="dashboard-title">Cattle Vaccination Statistics</h2>
+        {% csrf_token %}
+        <div class="filter-container">
+            <select id="vaccineTypeFilter">
+                <option value="all">All Vaccines</option>
+                <option value="Anthrax">Anthrax</option>
+                <option value="Blackleg">Blackleg</option>
+                <option value="LumpySkinDisease">Lumpy Skin Disease</option>
+                <option value="BovinePateurollosis">Bovine Pateurollosis</option>
+                <option value="FootAndMouth">Foot And Mouth</option>
+            </select>
+            <select id="periodFilter">
+                <option value="all">All Time</option>
+                <option value="1">Last Month</option>
+                <option value="3">Last 3 Months</option>
+                <option value="6">Last 6 Months</option>
+                <option value="12">Last Year</option>
+            </select>
+            <button id="applyFilter">Apply Filters</button>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-title">Total Cattle</div>
+                <div class="stat-number" id="totalCattle">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Vaccinated</div>
+                <div class="stat-number" id="vaccinated">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Due for Vaccination</div>
+                <div class="stat-number" id="dueForVaccination">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Vaccination Rate</div>
+                <div class="stat-number" id="vaccinationRate">0%</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart">
+                <canvas id="vaccinationChart"></canvas>
+            </div>
+            <div class="chart">
+                <canvas id="vaccineTypeChart"></canvas>
+            </div>
+        </div>
+
+<!-- Add this section after the chart-container div in your HTML -->
+<div id="detailed-report-container" class="mt-5" style="display: none;">
+    <h3 class="dashboard-title" id="detailed-report-title">Vaccination Details</h3>
+    
+    <!-- Report Type Toggle -->
+    <div class="report-toggle-container text-center mb-4">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-success active" id="all-vaccinated-btn">All Vaccinated Cattle</button>
+            <button type="button" class="btn btn-outline-success" id="by-vaccine-type-btn">By Vaccine Type</button>
+        </div>
+    </div>
+    
+    <!-- All Vaccinated Cattle View -->
+    <div id="all-vaccinated-view">
+        <table class="vaccine-table" id="vaccinated-cattle-table">
+            <thead>
+                <tr>
+                    <th>Tag Number</th>
+                    <th>Breed</th>
+                    <th>Age</th>
+                    <th>Vaccine Type</th>
+                    <th>Vaccination Date</th>
+                    <th>Next Due Date</th>
+                </tr>
+            </thead>
+            <tbody id="vaccinatedCattleTableBody">
+                <!-- Data will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- By Vaccine Type View -->
+    <div id="by-vaccine-type-view" style="display: none;">
+        <div class="vaccine-type-filter mb-3">
+            <label for="detailedVaccineTypeFilter" class="me-2">Select Vaccine Type:</label>
+            <select id="detailedVaccineTypeFilter" class="form-select" style="max-width: 300px; display: inline-block;">
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </div>
+        <div id="vaccine-type-details">
+            <!-- Vaccine type details will be shown here -->
+        </div>
+    </div>
+    
+    <div class="export-buttons mt-4">
+        <button id="exportDetailedExcel"><i class="far fa-file-excel"></i> Export to Excel</button>
+        <button id="exportDetailedPDF"><i class="far fa-file-pdf"></i> Export to PDF</button>
+        <button id="printDetailedReport"><i class="fas fa-print"></i> Print Report</button>
+        <button id="backToDashboard" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+    </div>
+</div>
+
+
+
+
+        <h3 class="dashboard-title mt-5">Cattle Due for Vaccination</h3>
+        <table class="vaccine-table">
+            <thead>
+                <tr>
+                    <th>Tag Number</th>
+                    <th>Breed</th>
+                    <th>Age</th>
+                    <th>Last Vaccination</th>
+                    <th>Next Due Date</th>
+                    <th>Days Overdue</th>
+                </tr>
+            </thead>
+            <tbody id="dueVaccinationTable">
+                <!-- Data will be populated by JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="export-buttons">
+            <button id="exportExcel"><i class="far fa-file-excel"></i> Export to Excel</button>
+            <button id="exportPDF"><i class="far fa-file-pdf"></i> Export to PDF</button>
+            <button id="printReport"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'lib/parallax/parallax.min.js' %}"></script>
+    <script src="{% static 'lib/lightbox/js/lightbox.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Dashboard JavaScript -->
+    <script>
+        
+$(document).ready(function() {
+    // Initialize charts
+    let statusChart = null;
+    let typeChart = null;
+    let monthlyChart = null;
+
+    // Function to fetch dashboard data
+    function fetchDashboardData() {
+        const vaccineType = $('#vaccineTypeFilter').val();
+        const period = $('#periodFilter').val();
+        
+        $.ajax({
+            url: '/api/get_vaccination_data/',
+            type: 'GET',
+            data: {
+                vaccine_type: vaccineType,
+                period: period
+            },
+            success: function(data) {
+                updateDashboardStats(data);
+                updateCharts(data);
+                updateDueTable(data.dueCattle);
+            },
+            error: function(error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        });
+    }
+
+    // Function to update dashboard statistics
+    function updateDashboardStats(data) {
+        $('#totalCattle').text(data.totalCattle);
+        $('#vaccinated').text(data.vaccinated);
+        $('#dueForVaccination').text(data.dueForVaccination);
+        $('#vaccinationRate').text(data.vaccinationRate + '%');
+    }
+
+    // Function to update charts
+    function updateCharts(data) {
+        // Vaccination Status Chart
+        const statusData = {
+            labels: ['Vaccinated', 'Due for Vaccination'],
+            datasets: [{
+                data: [data.vaccinated, data.dueForVaccination],
+                backgroundColor: ['#5b8c51', '#ffc107'],
+                hoverBackgroundColor: ['#4e7f47', '#e0a800']
+            }]
+        };
+        
+        if (statusChart) {
+            statusChart.data = statusData;
+            statusChart.update();
+        } else {
+            const statusCtx = document.getElementById('vaccinationChart').getContext('2d');
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: statusData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vaccination Status'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Vaccine Type Distribution Chart
+        const labels = Object.keys(data.vaccineTypeDistribution);
+        const values = Object.values(data.vaccineTypeDistribution);
+        
+        const typeData = {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Vaccinations',
+                data: values,
+                backgroundColor: [
+                    '#5b8c51', '#3498db', '#9b59b6', '#e74c3c', 
+                    '#f39c12', '#16a085', '#d35400', '#2c3e50'
+                ]
+            }]
+        };
+        
+        if (typeChart) {
+            typeChart.data = typeData;
+            typeChart.update();
+        } else {
+            const typeCtx = document.getElementById('vaccineTypeChart').getContext('2d');
+            typeChart = new Chart(typeCtx, {
+                type: 'pie',
+                data: typeData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vaccination Type Distribution'
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Function to update the due vaccination table
+    function updateDueTable(dueCattle) {
+        const tableBody = $('#dueVaccinationTable');
+        tableBody.empty();
+        
+        if (dueCattle.length === 0) {
+            tableBody.append('<tr><td colspan="6" class="text-center">No cattle due for vaccination</td></tr>');
+            return;
+        }
+        
+        dueCattle.forEach(cattle => {
+            const row = $('<tr>');
+            row.append(`<td>${cattle.tagNo}</td>`);
+            row.append(`<td>${cattle.breed}</td>`);
+            row.append(`<td>${cattle.age}</td>`);
+            row.append(`<td>${cattle.lastVaccination}</td>`);
+            row.append(`<td>${cattle.nextDueDate}</td>`);
+            
+            // Apply tag-due class if days overdue > 0
+            const daysOverdueDisplay = cattle.daysOverdue > 0 ? 
+                `<span class="tag-due">${cattle.daysOverdue} days</span>` : 
+                cattle.daysOverdue;
+            
+            row.append(`<td>${daysOverdueDisplay}</td>`);
+            tableBody.append(row);
+        });
+    }
+
+    // Export to Excel functionality
+    $('#exportExcel').click(function() {
+        const vaccineType = $('#vaccineTypeFilter').val();
+        const period = $('#periodFilter').val();
+        
+        $.ajax({
+            url: '/api/get_vaccination_data/',
+            type: 'GET',
+            data: {
+                vaccine_type: vaccineType,
+                period: period
+            },
+            success: function(data) {
+                exportToExcel(data);
+            }
+        });
+    });
+    
+    function exportToExcel(data) {
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(data.dueCattle);
+        
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Due Vaccinations");
+        
+        // Export to Excel
+        XLSX.writeFile(wb, "Vaccination_Report.xlsx");
+    }
+
+    // Export to PDF functionality
+    $('#exportDetailedPDF').click(function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add title - different based on which view is active
+    doc.setFontSize(18);
+    
+    if ($('#all-vaccinated-view').is(':visible')) {
+        doc.text("All Vaccinated Cattle Report", 14, 22);
+        
+        // Get table data from the visible table
+        const tableData = [];
+        $('#vaccinatedCattleTableBody tr').each(function() {
+            const rowData = [];
+            $(this).find('td').each(function() {
+                rowData.push($(this).text());
+            });
+            tableData.push(rowData);
+        });
+        
+        // Add table header
+        doc.setFontSize(12);
+        doc.text("Tag Number", 20, 40);
+        doc.text("Breed", 60, 40);
+        doc.text("Age", 100, 40);
+        doc.text("Vaccine Type", 130, 40);
+        doc.text("Last Vaccination", 170, 40);
+        
+        // Add table data
+        let yPos = 50;
+        tableData.forEach(row => {
+            if (yPos > 270) {
+                // Add new page if needed
+                doc.addPage();
+                yPos = 20;
+                
+                // Repeat header on new page
+                doc.text("Tag Number", 20, yPos);
+                doc.text("Breed", 60, yPos);
+                doc.text("Age", 100, yPos);
+                doc.text("Vaccine Type", 130, yPos);
+                doc.text("Last Vaccination", 170, yPos);
+                
+                yPos += 10;
+            }
+            
+            doc.text(row[0], 20, yPos);
+            doc.text(row[1], 60, yPos);
+            doc.text(row[2], 100, yPos);
+            doc.text(row[3], 130, yPos);
+            doc.text(row[4], 170, yPos);
+            
+            yPos += 10;
+        });
+    } else {
+        doc.text("Cattle by Vaccine Type Report", 14, 22);
+        
+        // For vaccine type view, we'll capture each section
+        let yPos = 40;
+        $('.vaccine-type-section:visible').each(function() {
+            const vaccineType = $(this).find('.vaccine-type-title').text();
+            const cattleCount = $(this).find('.vaccine-count-badge').text();
+            
+            // Check if we need a new page
+            if (yPos > 260) {
+                doc.addPage();
+                yPos = 20;
+            }
+            
+            // Add section header
+            doc.setFontSize(14);
+            doc.text(`${vaccineType} (${cattleCount})`, 14, yPos);
+            yPos += 10;
+            
+            // Add table data
+            doc.setFontSize(10);
+            $(this).find('tbody tr').each(function() {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                const tagNo = $(this).find('td:eq(0)').text();
+                const breed = $(this).find('td:eq(1)').text();
+                const vaccination = $(this).find('td:eq(3)').text();
+                
+                doc.text(`${tagNo} - ${breed} - Last vaccinated: ${vaccination}`, 20, yPos);
+                yPos += 8;
+            });
+            
+            yPos += 15; // Space between sections
+        });
+    }
+    
+    // Add date at the end
+    doc.setFontSize(10);
+    doc.text(`Report generated on: ${new Date().toLocaleDateString()}`, 14, doc.internal.pageSize.height - 10);
+    
+    // Save the PDF
+    doc.save("Vaccinated_Cattle_Report.pdf");
+});
+    // Print report functionality
+    $('#printReport').click(function() {
+        window.print();
+    });
+
+    // Apply filters button click handler
+    $('#applyFilter').click(function() {
+        fetchDashboardData();
+    });
+
+    // Initial data load
+    fetchDashboardData();
+});
+
+
+// Add these functions to your existing script
+$(document).ready(function() {
+    // Your existing code...
+    
+    // Add click handler for "Vaccinated" stat card
+    $('#vaccinated').parent().addClass('clickable').click(function() {
+        showDetailedReport('vaccinated');
+    });
+    
+    // Function to show detailed report
+    function showDetailedReport(reportType) {
+        // Fetch the data if needed
+        fetchVaccinatedCattleData();
+        
+        // Show the detailed report container
+        $('#detailed-report-container').fadeIn();
+        
+        // Set the title based on type
+        $('#detailed-report-title').text('Vaccinated Cattle Details');
+        
+        // Scroll to the report section
+        $('html, body').animate({
+            scrollTop: $('#detailed-report-container').offset().top - 100
+        }, 500);
+    }
+    
+    // Function to fetch vaccinated cattle data
+    function fetchVaccinatedCattleData() {
+        const vaccineType = $('#vaccineTypeFilter').val();
+        const period = $('#periodFilter').val();
+        
+        $.ajax({
+            url: '/api/get_vaccination_data/',
+            type: 'GET',
+            data: {
+                vaccine_type: vaccineType,
+                period: period
+            },
+            success: function(data) {
+                updateVaccinatedCattleTable(data.vaccinatedCattle);
+                updateVaccineTypeView(data.vaccineTypeGroups);
+                populateVaccineTypeDropdown(data.vaccineTypeGroups);
+            },
+            error: function(error) {
+                console.error('Error fetching vaccinated cattle data:', error);
+            }
+        });
+    }
+    
+    // Update the vaccinated cattle table
+    function updateVaccinatedCattleTable(cattle) {
+        const tableBody = $('#vaccinatedCattleTableBody');
+        tableBody.empty();
+        
+        if (cattle.length === 0) {
+            tableBody.append('<tr><td colspan="6" class="text-center">No vaccinated cattle found</td></tr>');
+            return;
+        }
+        
+        cattle.forEach(item => {
+            const row = $('<tr>');
+            row.append(`<td>${item.tagNo}</td>`);
+            row.append(`<td>${item.breed}</td>`);
+            row.append(`<td>${item.age}</td>`);
+            row.append(`<td>${item.vaccinationType}</td>`);
+            row.append(`<td>${item.lastVaccination}</td>`);
+            row.append(`<td>${item.nextDueDate}</td>`);
+            tableBody.append(row);
+        });
+    }
+    
+    // Update the vaccine type view
+    function updateVaccineTypeView(vaccineGroups) {
+        const container = $('#vaccine-type-details');
+        container.empty();
+        
+        Object.keys(vaccineGroups).forEach(type => {
+            const cattle = vaccineGroups[type];
+            
+            const section = $('<div class="vaccine-type-section fade-in mb-4">');
+            
+            // Create header
+            const header = $('<div class="vaccine-type-header">');
+            header.append(`<h4 class="vaccine-type-title">${type}</h4>`);
+            header.append(`<span class="vaccine-count-badge">${cattle.length} cattle</span>`);
+            section.append(header);
+            
+            // Create table
+            const table = $('<table class="vaccine-table mt-3">');
+            table.append(`
+                <thead>
+                    <tr>
+                        <th>Tag Number</th>
+                        <th>Breed</th>
+                        <th>Age</th>
+                        <th>Last Vaccination</th>
+                        <th>Next Due Date</th>
+                    </tr>
+                </thead>
+            `);
+            
+            const tbody = $('<tbody>');
+            cattle.forEach(item => {
+                const row = $('<tr>');
+                row.append(`<td>${item.tagNo}</td>`);
+                row.append(`<td>${item.breed}</td>`);
+                row.append(`<td>${item.age}</td>`);
+                row.append(`<td>${item.lastVaccination}</td>`);
+                row.append(`<td>${item.nextDueDate}</td>`);
+                tbody.append(row);
+            });
+            
+            table.append(tbody);
+            section.append(table);
+            container.append(section);
+        });
+    }
+    
+    // Populate vaccine type dropdown
+    function populateVaccineTypeDropdown(vaccineGroups) {
+        const dropdown = $('#detailedVaccineTypeFilter');
+        dropdown.empty();
+        
+        // Add All option
+        dropdown.append('<option value="all">All Vaccine Types</option>');
+        
+        // Add each vaccine type
+        Object.keys(vaccineGroups).forEach(type => {
+            dropdown.append(`<option value="${type}">${type} (${vaccineGroups[type].length})</option>`);
+        });
+        
+        // Add change handler
+        dropdown.change(function() {
+            const selectedType = $(this).val();
+            
+            if (selectedType === 'all') {
+                $('.vaccine-type-section').show();
+            } else {
+                $('.vaccine-type-section').hide();
+                $(`.vaccine-type-section:contains('${selectedType}')`).show();
+            }
+        });
+    }
+    
+    // Toggle between views
+    $('#all-vaccinated-btn').click(function() {
+        $(this).addClass('active').removeClass('btn-outline-success').addClass('btn-success');
+        $('#by-vaccine-type-btn').removeClass('active').removeClass('btn-success').addClass('btn-outline-success');
+        $('#all-vaccinated-view').show();
+        $('#by-vaccine-type-view').hide();
+    });
+    
+    $('#by-vaccine-type-btn').click(function() {
+        $(this).addClass('active').removeClass('btn-outline-success').addClass('btn-success');
+        $('#all-vaccinated-btn').removeClass('active').removeClass('btn-success').addClass('btn-outline-success');
+        $('#all-vaccinated-view').hide();
+        $('#by-vaccine-type-view').show();
+    });
+    
+    // Back to dashboard button
+    $('#backToDashboard').click(function() {
+        $('#detailed-report-container').fadeOut();
+    });
+    
+    // Detailed export buttons
+    $('#exportDetailedExcel').click(function() {
+        const vaccineType = $('#vaccineTypeFilter').val();
+        const period = $('#periodFilter').val();
+        
+        $.ajax({
+            url: '/api/get_vaccination_data/',
+            type: 'GET',
+            data: {
+                vaccine_type: vaccineType,
+                period: period
+            },
+            success: function(data) {
+                exportVaccinatedToExcel(data);
+            }
+        });
+    });
+    
+    function exportVaccinatedToExcel(data) {
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(data.vaccinatedCattle);
+        
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Vaccinated Cattle");
+        
+        // Export to Excel
+        XLSX.writeFile(wb, "Vaccinated_Cattle_Report.xlsx");
+    }
+    
+    $('#exportDetailedPDF').click(function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add title
+        doc.setFontSize(18);
+        doc.text("Vaccinated Cattle Report", 14, 22);
+        
+        // Add date
+        doc.setFontSize(12);
+        doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 14, 30);
+        
+        // Add summary statistics
+        doc.setFontSize(14);
+        doc.text("Summary Statistics", 14, 40);
+        
+        doc.setFontSize(12);
+        doc.text(`Total Cattle: ${$('#totalCattle').text()}`, 14, 50);
+        doc.text(`Vaccinated: ${$('#vaccinated').text()}`, 14, 58);
+        
+        // Save the PDF
+        doc.save("Vaccinated_Cattle_Report.pdf");
+    });
+    
+    $('#printDetailedReport').click(function() {
+        window.print();
+    });
+});
+
+    </script>
+</body>
+</html>

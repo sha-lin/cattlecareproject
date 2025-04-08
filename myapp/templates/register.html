@@ -1,0 +1,201 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <title>Multiple user login</title>
+    <link href='https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css' rel='stylesheet'>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Open sans';
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #5b8c51
+        }
+
+        body>* {
+            margin: 0;
+            padding: 0;
+            box-sizing: inherit;
+        }
+
+        .wrapper {
+            width: 700px;
+            background: #FFF;
+            border-radius: 10px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, .05);
+            overflow: hidden;
+        }
+
+        h1.title {
+            padding: 15px 0;
+            margin-left: 25px;
+            font-weight: normal;
+            color: #5b8c51
+        }
+
+        .form {
+            width: 700px;
+        }
+
+        .myform {
+            background: #F4F5F7;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 25px
+        }
+
+        .myform label {
+            display: block;
+            color: #000;
+            font-weight: bold;
+            font-size: .8rem;
+            margin-bottom: 10px;
+        }
+
+        .myform input,
+        .myform select {
+            border: 0;
+            outline: 0;
+            height: 50px;
+            background: #D3D3D3;
+            width: 100%;
+            border-radius: 5px;
+            color: #5b8c51;
+            font-weight: 700;
+            font-size: .9rem;
+            text-indent: 15px;
+            border: 2px solid transparent;
+            transition: border 250ms;
+        }
+
+        .full-width {
+            grid-column: -1 / 1
+        }
+
+        .button {
+            grid-column: -1 / 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .button button {
+            border: 0;
+            outline: 0;
+            width: 120px;
+            height: 50px;
+            border-radius: 50px;
+            color: #FFF;
+            font-weight: bold;
+            font-size: .9rem;
+            cursor: pointer;
+            background: linear-gradient(356deg, #5b8c51 0%, rgba(83, 208, 11, 0.711) 100%);
+        }
+
+        .button button:hover {
+            background: #5b8c51;
+        }
+    </style>
+  </head>
+  <body oncontextmenu='return false' class='snippet-body'>
+  <div class="wrapper">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6 contents">
+          <div class="row justify-content-center">
+            <div class="col-md-12">
+              <div class="form-block">
+                  <div class="mb-4">
+                      <h1>User Registration page</h1>
+                </div>
+                  <span class="mb-0 text-muted">
+                {% if msg %}
+                    {{ msg | safe }}
+                {% else %}
+                    Login page
+                {% endif %}
+              </span>
+                <form  method="post" action="{% url 'register' %}">
+                    {% csrf_token %}
+                  <div class="form-group first">
+                    <label for="username">Username</label>
+                      {{ form.username }}
+                  </div>
+                  <div class="form-group first">
+                    <label for="email">Email</label>
+                      {{ form.email}}
+                  </div>
+                  <div class="form-group first">
+                    <label for="Phone">Phone</label>
+                      {{ form.phone}}
+                  </div>
+                  <div class="form-group last mb-4">
+                    <label for="password">Password</label>
+                      {{ form.password1 }}
+                  </div>
+                  <div class="form-group last mb-4">
+                    <label for="password">confirm Password</label>
+                      {{ form.password2 }}
+                  </div>
+                  <div class="d-flex mb-5 align-items-center">
+                    <label class="control control--checkbox mb-0"><span class="caption">Admin</span>
+                        {{ form.is_admin }}
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <div class="d-flex mb-5 align-items-center">
+                    <label class="control control--checkbox mb-0"><span class="caption">farmer</span>
+                        {{ form.is_farmer }}
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <div class="d-flex mb-5 align-items-center">
+                    <label class="control control--checkbox mb-0"><span class="caption">vet</span>
+                        {{ form.is_vet }}
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                    <span class="text-error">{{ form.errors }}</span>
+                  <input type="submit"  value="Register" class="btn btn-pill text-white btn-block btn-primary">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+  </body>
+</html>

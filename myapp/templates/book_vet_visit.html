@@ -1,0 +1,14 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="cattle_id">Select Cattle:</label>
+    <select name="cattle_id">
+        {% for cow in cattle %}
+            <option value="{{ cow.id }}">{{ cow.tagno }}</option>
+        {% endfor %}
+    </select>
+    <label for="visit_date">Visit Date:</label>
+    <input type="date" name="visit_date" required>
+    <label for="description">Description:</label>
+    <textarea name="description" required></textarea>
+    <button type="submit">Book Visit</button>
+</form>

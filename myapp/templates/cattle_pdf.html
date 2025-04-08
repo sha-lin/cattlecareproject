@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cattle Report</title>
+</head>
+<body>
+    <h1>Cattle Report</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Tag Number</th>
+                <th>Breed</th>
+                <th>Gender</th>
+                <th>Date of Birth</th>
+                <th>Age (Months)</th>
+                <th>Age (Years)</th>
+                <th>Weight</th>
+                <th>Color</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cattle in cattle_data %}
+            <tr>
+                <td>{{ cattle.tagno }}</td>
+                <td>{{ cattle.breed }}</td>
+                <td>{{ cattle.gender }}</td>
+                <td>{{ cattle.dob }}</td>
+                <td>{{ cattle.age }}</td>
+                <td>{{ cattle.age_years }}</td>
+                <td>{{ cattle.weight }}</td>
+                <td>{{ cattle.color }}</td>
+                <td>{{ cattle.owner.firstname }} {{ cattle.owner.lastname }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

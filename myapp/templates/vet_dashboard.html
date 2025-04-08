@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Vet Dashboard</h1>
+    <h2>Farmers</h2>
+    <ul>
+        {% for farmer in farmers %}
+        <li>{{ farmer.firstname }} {{ farmer.lastname }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Health Records</h2>
+    <ul>
+        {% for record in health_records %}
+        <li>{{ record.cattle.tagno }} - {{ record.description }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Appointments</h2>
+    <ul>
+        {% for appointment in appointments %}
+        <li>{{ appointment.first_name }} {{ appointment.last_name }} - {{ appointment.request }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Feedbacks</h2>
+    <ul>
+        {% for feedback in feedbacks %}
+        <li>{{ feedback.message }}
+            <form action="{% url 'respond_feedback' feedback.id %}" method="POST">
+                {% csrf_token %}
+                <textarea name="response">{{ feedback.response }}</textarea>
+                <button type="submit">Respond</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Vaccinations</h2>
+    <ul>
+        {% for vaccination in vaccinations %}
+        <li>{{ vaccination.cattle.tagno }} - {{ vaccination.vaccine }} ({{ vaccination.date }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

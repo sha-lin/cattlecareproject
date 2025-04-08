@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Respond to Feedback</h1>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <textarea name="response">{{ feedback.response }}</textarea>
+        <button type="submit">Save Response</button>
+    </form>
+</div>
+{% endblock %}

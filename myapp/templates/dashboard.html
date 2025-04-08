@@ -1,0 +1,11 @@
+<h1>Dashboard</h1>
+{% if role == 'farmer' %}
+    <a href="{% url 'book_vet_visit' %}">Book a Vet Visit</a>
+{% elif role == 'vet' %}
+    <a href="{% url 'add_health_record' %}">Add Health Record</a>
+{% endif %}
+<ul>
+    {% for visit in visits %}
+        <li>{{ visit }}</li>
+    {% endfor %}
+</ul>

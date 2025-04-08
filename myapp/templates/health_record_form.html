@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add/Edit Health Record</title>
+</head>
+<body>
+    <h1>{{ health_record.id|yesno:"Edit Health Record,Add Health Record" }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description">{{ health_record.description }}</textarea><br>
+        <label for="treatment">Treatment:</label><br>
+        <textarea id="treatment" name="treatment">{{ health_record.treatment }}</textarea><br>
+        <label for="veterinarian">Veterinarian:</label><br>
+        <input type="text" id="veterinarian" name="veterinarian" value="{{ health_record.veterinarian }}"><br>
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>

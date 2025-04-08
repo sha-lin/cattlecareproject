@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Farmer Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}</h1>
+    <h2>Farmer Dashboard</h2>
+    <ul>
+        <li><a href="{% url 'cattlereg' %}">Register Cattle</a></li>
+        <li><a href="{% url 'vaccinate' %}">View Vaccination</a></li>
+        <li><a href="{% url 'ai' %}">Artificial Insemination</a></li>
+        <li><a href="{% url 'profile' %}">Profile</a></li>
+        <li><a href="{% url 'logout_view' %}">Logout</a></li>
+    </ul>
+</body>
+</html>

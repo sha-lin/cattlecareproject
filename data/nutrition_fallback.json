@@ -1,0 +1,125 @@
+// NUTRITION_FALLBACK_FILE = os.path.join(os.path.dirname(__file__), 'data/nutrition_fallback.json')
+def get_nutrition_fallback_data():
+    """Load fallback nutrition data from JSON file"""
+    try:
+        with open(NUTRITION_FALLBACK_FILE, 'r') as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Return basic default data if file not found or invalid
+        return {
+            "breeds": {
+                "Holstein": {
+                    "calf": {
+                        "dry_matter": "2-3% of body weight",
+                        "protein": "18-20%",
+                        "energy": "3.0 Mcal/kg",
+                        "calcium": "0.7%",
+                        "phosphorus": "0.45%"
+                    },
+                    "heifer": {
+                        "dry_matter": "2.2% of body weight",
+                        "protein": "14-16%",
+                        "energy": "2.6 Mcal/kg",
+                        "calcium": "0.5%",
+                        "phosphorus": "0.3%"
+                    },
+                    "dry": {
+                        "dry_matter": "1.8% of body weight",
+                        "protein": "12-14%",
+                        "energy": "2.4 Mcal/kg",
+                        "calcium": "0.45%",
+                        "phosphorus": "0.3%"
+                    },
+                    "early_lactation": {
+                        "dry_matter": "3.5-4% of body weight",
+                        "protein": "17-19%",
+                        "energy": "2.8 Mcal/kg",
+                        "calcium": "0.8%",
+                        "phosphorus": "0.45%"
+                    }
+                },
+                "Jersey": {
+                    "calf": {
+                        "dry_matter": "2-3% of body weight",
+                        "protein": "18-20%",
+                        "energy": "3.0 Mcal/kg",
+                        "calcium": "0.7%",
+                        "phosphorus": "0.45%"
+                    },
+                    "heifer": {
+                        "dry_matter": "2.2% of body weight",
+                        "protein": "14-16%",
+                        "energy": "2.6 Mcal/kg",
+                        "calcium": "0.5%",
+                        "phosphorus": "0.3%"
+                    },
+                    "dry": {
+                        "dry_matter": "1.7% of body weight",
+                        "protein": "12-14%",
+                        "energy": "2.4 Mcal/kg",
+                        "calcium": "0.45%",
+                        "phosphorus": "0.3%"
+                    },
+                    "early_lactation": {
+                        "dry_matter": "3.7-4.2% of body weight",
+                        "protein": "17-19%",
+                        "energy": "2.8 Mcal/kg",
+                        "calcium": "0.8%",
+                        "phosphorus": "0.45%"
+                    }
+                },
+                "default": {
+                    "calf": {
+                        "dry_matter": "2-3% of body weight",
+                        "protein": "18%",
+                        "energy": "2.8 Mcal/kg",
+                        "calcium": "0.7%",
+                        "phosphorus": "0.4%"
+                    },
+                    "heifer": {
+                        "dry_matter": "2.2% of body weight",
+                        "protein": "14%",
+                        "energy": "2.5 Mcal/kg",
+                        "calcium": "0.5%",
+                        "phosphorus": "0.3%"
+                    },
+                    "dry": {
+                        "dry_matter": "1.8% of body weight",
+                        "protein": "12%",
+                        "energy": "2.3 Mcal/kg",
+                        "calcium": "0.45%",
+                        "phosphorus": "0.3%"
+                    },
+                    "early_lactation": {
+                        "dry_matter": "3.5% of body weight",
+                        "protein": "17%",
+                        "energy": "2.7 Mcal/kg",
+                        "calcium": "0.75%",
+                        "phosphorus": "0.4%"
+                    }
+                }
+            },
+            "feed_recommendations": {
+                "calf": [
+                    {"name": "Calf starter feed", "amount_formula": "weight * 0.01", "purpose": "Growth and development"},
+                    {"name": "High-quality hay", "amount_formula": "weight * 0.005", "purpose": "Rumen development"},
+                    {"name": "Milk replacer", "amount_formula": "weight * 0.015", "purpose": "Main nutrition source"}
+                ],
+                "heifer": [
+                    {"name": "Quality grass hay", "amount_formula": "weight * 0.015", "purpose": "Fiber source"},
+                    {"name": "Heifer grain mix", "amount_formula": "weight * 0.01", "purpose": "Energy and protein"},
+                    {"name": "Mineral supplement", "amount_formula": "0.1", "purpose": "Mineral requirements"}
+                ],
+                "dry": [
+                    {"name": "Grass hay", "amount_formula": "weight * 0.015", "purpose": "Bulk feed"},
+                    {"name": "Dry cow mineral mix", "amount_formula": "0.15", "purpose": "Minerals and vitamins"},
+                    {"name": "Limited grain", "amount_formula": "weight * 0.003", "purpose": "Energy supplement"}
+                ],
+                "early_lactation": [
+                    {"name": "High-quality silage", "amount_formula": "weight * 0.02", "purpose": "Bulk and energy"},
+                    {"name": "Dairy concentrate", "amount_formula": "weight * 0.01 + milk_production * 0.4", "purpose": "Production support"},
+                    {"name": "Protein supplement", "amount_formula": "milk_production * 0.1", "purpose": "Protein for milk production"},
+                    {"name": "Mineral mix", "amount_formula": "0.15", "purpose": "Minerals and vitamins"}
+                ]
+            }
+        }
