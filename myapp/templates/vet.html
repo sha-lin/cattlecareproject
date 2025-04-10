@@ -261,37 +261,28 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="tagno">Tag Number:</label>
-                    <input type="text" id="tagno" name="tagno" pattern="[0-9]{5}" required 
-                           placeholder="Enter 5-digit tag number">
-                    <small class="text-muted">Enter the 5-digit tag number of the cattle</small>
+                    <select id="tagno" name="tagno" required>
+                        <option value="">Select a tag number</option>
+                        {% for cattle in all_cattle %}
+                            <option value="{{ cattle.tagno }}">{{ cattle.tagno }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Select a registered cattle tag number</small>
                 </div>
                 <div class="form-group">
                     <label for="breed">Breed:</label>
-                    <select id="breed" name="breed" required>
-                        <option value="">Select a breed</option>
-                        <option value="Angus">Angus</option>
-                        <option value="Hereford">Hereford</option>
-                        <option value="Limousin">Limousin</option>
-                        <option value="Simmental">Simmental</option>
-                        <option value="Holstein">Holstein</option>
-                        <option value="Jersey">Jersey</option>
-                        <option value="Brahman">Brahman</option>
-                        <option value="Charolais">Charolais</option>
-                    </select>
+                    <input type="text" id="breed" name="breed" required readonly>
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="gender">Gender:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="gender" value="Male" required> Male</label>
-                        <label><input type="radio" name="gender" value="Female" required> Female</label>
-                    </div>
+                    <input type="text" id="gender" name="gender" required readonly>
                 </div>
                 <div class="form-group">
                     <label for="dob">Date of Birth:</label>
-                    <input type="date" id="dob" name="dob" required>
+                    <input type="date" id="dob" name="dob" required readonly>
                 </div>
             </div>
             
@@ -307,7 +298,7 @@
                         <option value="FootAndMouth">Foot and Mouth Disease</option>                        
                     </select>
                     <div class="next-vaccination" id="nextVaccinationInfo">
-                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="last_vaccination_date">Last Vaccination Date:</label>
@@ -342,24 +333,21 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="weight">Weight (kg):</label>
-                    <input type="number" id="weight" name="weight" min="1" step="0.1" required 
-                           placeholder="Enter weight in kilograms">
+                    <input type="number" id="weight" name="weight" min="1" step="0.1" required>
                 </div>
                 <div class="form-group">
                     <label for="color">Color:</label>
-                    <input type="text" id="color" name="color" required placeholder="Enter cattle color">
+                    <input type="text" id="color" name="color" required readonly>
                 </div>
             </div>
             
             <button type="submit" class="btn-submit">Submit Record</button>
         </form>
 
-        <div class="download-buttons">
-            <a href="{% url 'download_cattle_excel' %}" class="btn btn-success">Download Excel Report</a>
-            <a href="{% url 'download_cattle_pdf' %}" class="btn btn-primary">Download PDF Report</a>
-        </div>
+        <!-- Other content remains unchanged -->
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'lib/wow/wow.min.js' %}"></script>
@@ -373,6 +361,128 @@
     <script src="{% static 'js/main.js' %}"></script>
 
     <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('cattleRegistrationForm');
+            const tagnoField = document.getElementById("tagno");
+            const breedField = document.getElementById("breed");
+            const genderField = document.getElementById("gender");
+            const dobField = document.getElementById("dob");
+            const ageMonthsField = document.getElementById("age_months");
+            const ageYearsField = document.getElementById("age_years");
+            const weightField = document.getElementById("weight");
+            const colorField = document.getElementById("color");
+            const vaccinationTypeField = document.getElementById("vaccination_type");
+            const lastVaccinationField = document.getElementById("lastVaccination");
+            const nextVaccinationInfo = document.getElementById("nextVaccinationInfo");
+
+            // Vaccination schedules
+            const vaccinationSchedules = {
+                'Anthrax': 365,
+                'Blackleg': 180,
+                'Brucellosis': 365,
+                'FMD': 120,
+                'BVD': 365,
+                'LumpySkinDisease': 365,
+                'BovinePateurollosis': 180
+            };
+
+            // Auto-fill cattle information when tag number changes
+            tagnoField.addEventListener('change', function() {
+                const selectedTagNo = this.value;
+                if (selectedTagNo) {
+                    // Fetch cattle data using AJAX
+                    fetch(`/get_cattle_data/${selectedTagNo}/`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Populate fields with cattle data
+                            breedField.value = data.breed;
+                            genderField.value = data.gender;
+                            dobField.value = data.dob;
+                            ageMonthsField.value = data.age_months;
+                            ageYearsField.value = data.age_years;
+                            weightField.value = data.weight;
+                            colorField.value = data.color;
+                            
+                            // Calculate age (still keep this to ensure up-to-date age)
+                            calculateAge();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching cattle data:', error);
+                            alert('Error fetching cattle data. Please try again.');
+                        });
+                } else {
+                    // Clear fields if no tag is selected
+                    clearFormFields();
+                }
+            });
+
+            // Clear form fields function
+            function clearFormFields() {
+                breedField.value = '';
+                genderField.value = '';
+                dobField.value = '';
+                ageMonthsField.value = '0';
+                ageYearsField.value = '0';
+                weightField.value = '';
+                colorField.value = '';
+            }
+
+            // Age calculation
+            function calculateAge() {
+                const dob = new Date(dobField.value);
+                if (!isNaN(dob.getTime())) { // Check if valid date
+                    const today = new Date();
+                    const ageInMilliseconds = today - dob;
+                    const ageInDays = ageInMilliseconds / (1000 * 60 * 60 * 24);
+                    const ageYears = Math.floor(ageInDays / 365);
+                    const ageMonths = Math.floor((ageInDays % 365) / 30);
+                    
+                    ageMonthsField.value = ageMonths;
+                    ageYearsField.value = ageYears;
+                }
+            }
+
+            // Calculate next vaccination date
+            function updateNextVaccinationInfo() {
+                const vaccinationType = vaccinationTypeField.value;
+                const lastVaccinationDate = new Date(lastVaccinationField.value);
+                
+                if (vaccinationType && !isNaN(lastVaccinationDate.getTime())) {
+                    const daysInterval = vaccinationSchedules[vaccinationType] || 180; // Default to 180 days
+                    const nextVaccinationDate = new Date(lastVaccinationDate);
+                    nextVaccinationDate.setDate(nextVaccinationDate.getDate() + daysInterval);
+                    
+                    const formattedDate = nextVaccinationDate.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    nextVaccinationInfo.innerHTML = `Next vaccination due: <strong>${formattedDate}</strong>`;
+                } else {
+                    nextVaccinationInfo.innerHTML = '';
+                }
+            }
+
+            vaccinationTypeField.addEventListener('change', updateNextVaccinationInfo);
+            lastVaccinationField.addEventListener('input', updateNextVaccinationInfo);
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                // Add any additional validation here if needed
+                calculateAge(); // Ensure age is calculated before submission
+                updateNextVaccinationInfo(); // Ensure vaccination info is updated
+            });
+        });
+
+// test
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('cattleRegistrationForm');
             const dobField = document.getElementById("dob");

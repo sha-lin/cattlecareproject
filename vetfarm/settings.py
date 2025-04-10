@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['127.0.0.1','localhost', '67ca-41-90-172-211.ngrok-free.app']
 INSTALLED_APPS = [
 
     # 'this must be BEFORE 'admin_tools' and 'django.contrib.admin'
-    'django_nvd3',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

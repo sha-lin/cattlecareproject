@@ -46,6 +46,7 @@ urlpatterns=[
     path('cattle/<int:cattle_id>/nutrition/', views.cattle_nutrition, name='cattle_nutrition'),
     path('vaccination-dashboard/', views.vaccination_dashboard, name='vaccination_dashboard'),
     path('api/get_vaccination_data/', views.get_vaccination_data, name='get_vaccination_data'),
+    path('get_cattle_data/<str:tagno>/', views.get_cattle_data, name='get_cattle_data'),
     # path('vet/dashboard/', views.vet_dashboard, name='vet_dashboard'),
     # path('vet/dashboard/respond_feedback/<int:feedback_id>/', views.respond_feedback, name='respond_feedback'),
     # path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),

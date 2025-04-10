@@ -33,7 +33,6 @@ from django.http import HttpResponse
 from .models import Cattle
 import io
 from django.template.loader import render_to_string
-from xhtml2pdf import pisa
 from django.shortcuts import render, redirect
 from .forms import SignUpForm, LoginForm
 from django.contrib.auth import authenticate, login
@@ -251,7 +250,27 @@ from django.contrib import messages
 from .models import CattleRecord
 from datetime import date
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 
+# Add this new view function to handle the AJAX request
+def get_cattle_data(request, tagno):
+    try:
+        cattle = Cattle.objects.get(tagno=tagno)
+        data = {
+            'tagno': cattle.tagno,
+            'breed': cattle.breed,
+            'gender': cattle.gender,
+            'dob': cattle.dob.isoformat(),  # Format date as YYYY-MM-DD
+            'age_months': cattle.age_months,
+            'age_years': cattle.age_years,
+            'weight': cattle.weight,
+            'color': cattle.color
+        }
+        return JsonResponse(data)
+    except Cattle.DoesNotExist:
+        return JsonResponse({'error': 'Cattle not found'}, status=404)
+
+# Update your cattle_registration view to pass all cattle to the template
 def cattle_registration(request):
     if request.method == 'POST':
         try:
@@ -271,11 +290,6 @@ def cattle_registration(request):
             dob = date.fromisoformat(date_of_birth)
             last_vacc_date = date.fromisoformat(last_vaccination_date)
             
-            # Debug - Print vaccination type and check if it's in VACCINATION_SCHEDULES
-            print(f"Vaccination type from form: {vaccination_type!r}")
-            print(f"Available keys in VACCINATION_SCHEDULES: {list(VACCINATION_SCHEDULES.keys())}")
-            print(f"Lookup result: {VACCINATION_SCHEDULES.get(vaccination_type, 'Not found')}")
-
             # Create your cattle record
             cattle = Cattle.objects.get(tagno=tagno)
             cattle_record = CattleRecord(
@@ -283,28 +297,33 @@ def cattle_registration(request):
                 breed=breed,
                 gender=gender,
                 dob=dob,
-                vaccination_type=vaccination_type,  # This must match a key in VACCINATION_SCHEDULES
-                last_vaccination_date=last_vacc_date,  # Use parsed date object
-                age_months=0,  # The save method will calculate these
-                age_years=0,   # The save method will calculate these
+                vaccination_type=vaccination_type,
+                last_vaccination_date=last_vacc_date,
+                age_months=cattle.age_months,
+                age_years=cattle.age_years,
                 observation=observation,
                 disease_diagnosis=disease_diagnosis,
                 weight=float(weight),
                 color=color
             )
-            cattle_record.save()  # This will trigger the save method with our debug prints
+            cattle_record.save()
 
             messages.success(request, f'Cattle with tag number {tagno} registered successfully!')
-            return render(request, 'vet.html', {'cattle_record': cattle_record})
+            return render(request, 'vet.html', {
+                'cattle_record': cattle_record,
+                'all_cattle': Cattle.objects.all()
+            })
 
         except Exception as e:
             print(f"Error details: {e}")
             import traceback
-            traceback.print_exc()  # This will print the full error traceback
+            traceback.print_exc()
             messages.error(request, f'An error occurred: {str(e)}')
-            return render(request, 'vet.html')
+            return render(request, 'vet.html', {'all_cattle': Cattle.objects.all()})
 
-    return render(request, 'vet.html')
+    # For GET requests
+    all_cattle = Cattle.objects.all()
+    return render(request, 'vet.html', {'all_cattle': all_cattle})
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -805,7 +824,7 @@ from django.views.generic import ListView
 from django.template.loader import get_template
 import pandas as pd
 import io
-from xhtml2pdf import pisa
+# from xhtml2pdf import pisa
 from myapp.decorators import role_required
 
 # Create your views here.
@@ -973,7 +992,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime, timedelta
-import xlsxwriter
+# import xlsxwriter
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -1025,13 +1044,16 @@ def get_vaccination_data(request):
         vaccination_rate = round((vaccinated_cattle / total_cattle) * 100)
     
     # Get vaccine type distribution
-    vaccine_distribution = queryset.values('vaccination_type').annotate(
+    vaccine_distribution = queryset.filter(
+        last_vaccination_date__isnull=False
+    ).values('vaccination_type').annotate(
         count=Count('vaccination_type')
     ).order_by('vaccination_type')
     
     vaccine_data = {}
     for item in vaccine_distribution:
-        vaccine_data[item['vaccination_type']] = item['count']
+        if item['vaccination_type']:  # Ensure we have a valid type
+            vaccine_data[item['vaccination_type']] = item['count']
     
     # Get cattle due for vaccination
     due_cattle_records = queryset.filter(
@@ -1045,23 +1067,13 @@ def get_vaccination_data(request):
             "tagNo": record.tagno.tagno,
             "breed": record.breed,
             "age": f"{record.age_years} years, {record.age_months} months",
-            "lastVaccination": record.last_vaccination_date.strftime('%Y-%m-%d'),
-            "nextDueDate": record.next_vaccination_due.strftime('%Y-%m-%d'),
+            "lastVaccination": record.last_vaccination_date.strftime('%Y-%m-%d') if record.last_vaccination_date else "N/A",
+            "nextDueDate": record.next_vaccination_due.strftime('%Y-%m-%d') if record.next_vaccination_due else "N/A",
             "daysOverdue": days_overdue if days_overdue > 0 else 0,
             "vaccinationType": record.vaccination_type
         })
     
-    response_data = {
-        "totalCattle": total_cattle,
-        "vaccinated": vaccinated_cattle,
-        "dueForVaccination": due_cattle,
-        "vaccinationRate": vaccination_rate,
-        "vaccineTypeDistribution": vaccine_data,
-        "dueCattle": due_cattle_list
-    }
-
-
-    # Add this new section to get vaccinated cattle details
+    # Get vaccinated cattle details
     vaccinated_cattle_records = queryset.filter(
         last_vaccination_date__isnull=False
     ).select_related('tagno').order_by('last_vaccination_date')
@@ -1073,26 +1085,31 @@ def get_vaccination_data(request):
             "breed": record.breed,
             "age": f"{record.age_years} years, {record.age_months} months",
             "vaccinationType": record.vaccination_type,
-            "lastVaccination": record.last_vaccination_date.strftime('%Y-%m-%d'),
-            "nextDueDate": record.next_vaccination_due.strftime('%Y-%m-%d') if record.next_vaccination_due else "",
+            "lastVaccination": record.last_vaccination_date.strftime('%Y-%m-%d') if record.last_vaccination_date else "N/A",
+            "nextDueDate": record.next_vaccination_due.strftime('%Y-%m-%d') if record.next_vaccination_due else "N/A",
             "color": record.color,
             "weight": record.weight
         })
     
-    # Add this to group by vaccine type
+    # Group by vaccine type
     vaccine_type_groups = {}
     for cattle in vaccinated_cattle_list:
         vac_type = cattle["vaccinationType"]
-        if vac_type not in vaccine_type_groups:
-            vaccine_type_groups[vac_type] = []
-        vaccine_type_groups[vac_type].append(cattle)
+        if vac_type:  # Make sure we have a valid type
+            if vac_type not in vaccine_type_groups:
+                vaccine_type_groups[vac_type] = []
+            vaccine_type_groups[vac_type].append(cattle)
     
+    # Complete response data
     response_data = {
-        # Existing fields...
+        "totalCattle": total_cattle,
+        "vaccinated": vaccinated_cattle,
+        "dueForVaccination": due_cattle,
+        "vaccinationRate": vaccination_rate,
+        "vaccineTypeDistribution": vaccine_data,
         "dueCattle": due_cattle_list,
         "vaccinatedCattle": vaccinated_cattle_list,
         "vaccineTypeGroups": vaccine_type_groups
     }
     
     return JsonResponse(response_data)
-    

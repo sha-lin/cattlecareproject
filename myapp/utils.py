@@ -293,7 +293,7 @@ def get_feeding_tips(cattle, production_stage):
 
 
 import os
-from fpdf import FPDF
+# from fpdf import FPDF
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from .models import Cattle  # Import the model
