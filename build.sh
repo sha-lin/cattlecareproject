@@ -2,8 +2,13 @@
 # exit on error
 set -o errexit
 
+echo "Setting Python version..."
+export PYTHON_VERSION=3.11.4
+
+echo "Upgrading pip..."
+python -m pip install --upgrade pip
+
 echo "Installing dependencies..."
-pip install --upgrade pip
 pip install -r requirements.txt
 
 echo "Collecting static files..."
