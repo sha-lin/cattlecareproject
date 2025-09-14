@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,15 +85,23 @@ WSGI_APPLICATION = 'vetfarm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#       'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'new_cattledata',
+#         'USER': 'dbuser',
+#         'PASSWORD': 'new password',
+#         'HOST': 'localhost',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-      'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'new_cattledata',
-        'USER': 'dbuser',
-        'PASSWORD': 'new password',
-        'HOST': 'localhost',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
+        conn_max_age=600,
+    )
 }
+
 
 
 
@@ -142,6 +152,9 @@ GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
 }
+# WhiteNoise configuration for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -171,3 +184,8 @@ FARMSENSE_API_URL = 'https://api.farmsense.net/v1/animal/nutrition/'
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
