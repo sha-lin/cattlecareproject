@@ -1,4 +1,36 @@
+# Core Web Framework
 Django==4.2.7
-whitenoise==6.6.0
+djangorestframework==3.14.0
+
+# Database
+psycopg2-binary==2.9.9
 dj-database-url==2.1.0
+
+# Environment Configuration
 python-decouple==3.8
+
+# Authentication & Security
+django-cors-headers==4.3.1
+
+# File Handling & Media
+Pillow==10.0.1
+
+# Static Files
+whitenoise==6.6.0
+
+# Data Processing (for cattle analytics)
+pandas==2.1.3
+numpy==1.25.2
+
+# API & HTTP Requests
+requests==2.31.0
+python-dateutil==2.8.2
+
+# Production Server
+gunicorn==21.2.0
+
+# Form Handling
+django-crispy-forms==2.1
+
+# Additional utilities for cattle management
+django-filter==23.5
