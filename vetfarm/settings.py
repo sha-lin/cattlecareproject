@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-#a8837qd$xf9877_p*&g&=s(q*40sfx6re(qm@35@3e7dt@tf(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost', '67ca-41-90-172-211.ngrok-free.app', 'vercel.app', '.now.sh',]
+ALLOWED_HOSTS = ['127.0.0.1','localhost', '67ca-41-90-172-211.ngrok-free.app']
 
 # Application definition
 
@@ -85,22 +85,17 @@ WSGI_APPLICATION = 'vetfarm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#       'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'new_cattledata',
-#         'USER': 'dbuser',
-#         'PASSWORD': 'new password',
-#         'HOST': 'localhost',
-#     }
-# }
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
-        conn_max_age=600,
-    )
+    'default': {
+      'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'new_cattledata',
+        'USER': 'dbuser',
+        'PASSWORD': 'new password',
+        'HOST': 'localhost',
+    }
 }
+
+
 
 
 
@@ -185,7 +180,4 @@ FARMSENSE_API_URL = 'https://api.farmsense.net/v1/animal/nutrition/'
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-if not DEBUG:
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+
