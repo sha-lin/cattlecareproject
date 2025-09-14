@@ -147,8 +147,6 @@ GRAPH_MODELS = {
   'all_applications': True,
   'group_models': True,
 }
-# WhiteNoise configuration for static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 
