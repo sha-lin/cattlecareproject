@@ -1,22 +1,4 @@
-# Core Web Framework
 Django==4.2.7
-djangorestframework==3.14.0
-
-# Database (lightweight for Vercel)
-dj-database-url==2.1.0
-
-# Environment Configuration
-python-decouple==3.8
-
-# Authentication & Security
-django-cors-headers==4.3.1
-
-# File Handling (essential only)
-Pillow==10.0.1
-
-# Static Files
 whitenoise==6.6.0
-
-# Basic utilities
-requests==2.31.0
-python-dateutil==2.8.2
+dj-database-url==2.1.0
+python-decouple==3.8
